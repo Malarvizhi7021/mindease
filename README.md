@@ -27,6 +27,7 @@ git clone https://github.com/Malarvizhi7021/mindease.git
 cd mindease
 npm install
 npm start
+```
 
 ---
 
