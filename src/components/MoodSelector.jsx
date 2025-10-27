@@ -1,85 +1,93 @@
 import React, { useState, useEffect } from "react";
 
-const moods = [
-  { emoji: "😊", label: "Happy" },
-  { emoji: "😔", label: "Sad" },
-  { emoji: "😤", label: "Angry" },
-  { emoji: "😌", label: "Relaxed" },
-  { emoji: "😟", label: "Anxious" },
-];
-
-export default function MoodSelector() {
+const MoodSelector = () => {
   const [selectedMood, setSelectedMood] = useState("");
-  const [savedMood, setSavedMood] = useState("");
+  const [moodHistory, setMoodHistory] = useState([]);
 
+  // Load moods from localStorage when app starts
   useEffect(() => {
-    const storedMood = localStorage.getItem("todayMood");
-    if (storedMood) {
-      setSavedMood(storedMood);
-      setSelectedMood(storedMood);
-    }
+    const savedMoods = JSON.parse(localStorage.getItem("moods"));
+    if (savedMoods) setMoodHistory(savedMoods);
   }, []);
 
-  const handleSelect = (mood) => setSelectedMood(mood);
+  // Save moods to localStorage whenever moodHistory changes
+  useEffect(() => {
+    localStorage.setItem("moods", JSON.stringify(moodHistory));
+  }, [moodHistory]);
 
-  const handleSave = () => {
-    if (selectedMood) {
-      localStorage.setItem("todayMood", selectedMood);
-      setSavedMood(selectedMood);
-    }
+  const handleMoodSelect = (mood) => {
+    setSelectedMood(mood);
+    const newMood = {
+      mood,
+      date: new Date().toLocaleString(),
+    };
+    setMoodHistory([newMood, ...moodHistory]);
   };
 
   return (
-    <div
-      style={{
-        background: "white",
-        borderRadius: 16,
-        padding: 20,
-        boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
-        marginTop: 30,
-      }}
-    >
-      <h2 style={{ fontSize: 20, marginBottom: 10 }}>How are you feeling today?</h2>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        {moods.map((mood) => (
+    <div style={styles.container}>
+      <h2 style={styles.heading}>💭 How are you feeling today?</h2>
+      <div style={styles.moods}>
+        {["😊", "😐", "😔", "😤", "😴"].map((emoji) => (
           <button
-            key={mood.label}
-            onClick={() => handleSelect(mood.label)}
+            key={emoji}
             style={{
-              fontSize: 24,
-              padding: "10px 18px",
-              borderRadius: 12,
-              border: selectedMood === mood.label ? "2px solid #2563eb" : "1px solid #cbd5e1",
-              background: selectedMood === mood.label ? "#eff6ff" : "#f8fafc",
-              cursor: "pointer",
+              ...styles.moodButton,
+              backgroundColor: selectedMood === emoji ? "#4CAF50" : "#e0e0e0",
             }}
+            onClick={() => handleMoodSelect(emoji)}
           >
-            {mood.emoji} {mood.label}
+            {emoji}
           </button>
         ))}
       </div>
 
-      <button
-        onClick={handleSave}
-        style={{
-          marginTop: 20,
-          background: "#2563eb",
-          color: "white",
-          border: "none",
-          padding: "10px 20px",
-          borderRadius: 12,
-          fontSize: 16,
-          cursor: "pointer",
-        }}
-      >
-        Save Mood
-      </button>
-
-      {savedMood && (
-        <p style={{ marginTop: 15, color: "#475569" }}>
-          🌿 You’re feeling <strong>{savedMood}</strong> today.
-        </p>
-      )}
+      <div style={styles.history}>
+        <h3>📅 Mood History</h3>
+        {moodHistory.length === 0 ? (
+          <p>No moods recorded yet.</p>
+        ) : (
+          <ul>
+            {moodHistory.map((item, index) => (
+              <li key={index}>
+                {item.mood} — <small>{item.date}</small>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
-}
+};
+
+const styles = {
+  container: {
+    textAlign: "center",
+    margin: "20px auto",
+    padding: "20px",
+    backgroundColor: "#f7fdf8",
+    borderRadius: "12px",
+  },
+  heading: {
+    fontSize: "24px",
+  },
+  moods: {
+    marginTop: "10px",
+  },
+  moodButton: {
+    fontSize: "24px",
+    margin: "5px",
+    padding: "10px",
+    borderRadius: "10px",
+    border: "none",
+    cursor: "pointer",
+  },
+  history: {
+    marginTop: "20px",
+    textAlign: "left",
+    width: "80%",
+    margin: "0 auto",
+  },
+};
+
+export default MoodSelector;

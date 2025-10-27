@@ -1,12 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const JournalEntry = () => {
   const [entry, setEntry] = useState("");
   const [entries, setEntries] = useState([]);
 
+  // Load entries from localStorage when app starts
+  useEffect(() => {
+    const savedEntries = JSON.parse(localStorage.getItem("entries"));
+    if (savedEntries) setEntries(savedEntries);
+  }, []);
+
+  // Save entries to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("entries", JSON.stringify(entries));
+  }, [entries]);
+
   const handleSave = () => {
     if (entry.trim() !== "") {
-      setEntries([...entries, entry]);
+      const newEntry = {
+        text: entry,
+        date: new Date().toLocaleString(),
+      };
+      setEntries([newEntry, ...entries]);
       setEntry("");
     }
   };
@@ -33,7 +48,8 @@ const JournalEntry = () => {
         ) : (
           entries.map((note, index) => (
             <div key={index} style={styles.entry}>
-              <p>{note}</p>
+              <p>{note.text}</p>
+              <small style={{ color: "#555" }}>{note.date}</small>
             </div>
           ))
         )}
