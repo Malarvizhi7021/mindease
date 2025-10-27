@@ -60,7 +60,7 @@ Here’s a preview of the MindEase app interface:
 
 | Mood Tracker View | Journal View |
 |-------------------|--------------|
-| ![Mood Tracker](src/assets/screenshot1.png) | ![Journal Section](src/assets/screenshot.png) |
+| ![Mood Tracker](src/assets/screenshot.png) | ![Journal Section](src/assets/screenshot1.png) |
 
 ## 👩‍💻 Author
 
